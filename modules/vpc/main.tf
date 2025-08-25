@@ -33,6 +33,8 @@ resource "aws_subnet" "public" {
     {
       Name = "${var.name}-public-${var.azs[count.index]}"
       Type = "public"
+      "kubernetes.io/cluster/shopsphere-dev-eks" = "owned"
+      "kubernetes.io/role/elb" = "1"
     },
     var.public_subnet_tags
   )
@@ -48,6 +50,8 @@ resource "aws_subnet" "private" {
     {
       Name = "${var.name}-private-${var.azs[count.index]}"
       Type = "private"
+      "kubernetes.io/cluster/shopsphere-dev-eks" = "owned"
+      "kubernetes.io/role/internal-elb" = "1"
     },
     var.private_subnet_tags
   )
