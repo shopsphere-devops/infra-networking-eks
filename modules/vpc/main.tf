@@ -1,3 +1,6 @@
+# Creates a VPC with the CIDR block specified in var.vpc_cidr.
+# Enables DNS support and hostnames as per variables.
+# Tags the VPC with a name and any additional tags.
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = var.enable_dns_support
@@ -11,6 +14,8 @@ resource "aws_vpc" "this" {
   )
 }
 
+# Creates an Internet Gateway and attaches it to the VPC.
+# Tags it with a name and additional tags.
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -22,6 +27,10 @@ resource "aws_internet_gateway" "this" {
   )
 }
 
+# Creates multiple public subnets (one per entry in var.public_subnets).
+# Each subnet is in a specific AZ and has its own CIDR block.
+# Maps public IPs on launch.
+# Tags for Kubernetes and ELB integration.
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnets)
   vpc_id                  = aws_vpc.this.id
@@ -40,6 +49,9 @@ resource "aws_subnet" "public" {
   )
 }
 
+# Creates multiple private subnets (one per entry in var.private_subnets).
+# Each subnet is in a specific AZ and has its own CIDR block.
+# Tags for Kubernetes and internal ELB integration.
 resource "aws_subnet" "private" {
   count             = length(var.private_subnets)
   vpc_id            = aws_vpc.this.id
@@ -57,6 +69,7 @@ resource "aws_subnet" "private" {
   )
 }
 
+# Allocates an Elastic IP for the NAT Gateway.
 resource "aws_eip" "nat" {
   tags = merge(
     {
@@ -66,6 +79,9 @@ resource "aws_eip" "nat" {
   )
 }
 
+# Creates a NAT Gateway in the first public subnet.
+# Uses the Elastic IP created above.
+# Allows private subnets to access the internet (for updates, etc.) without exposing them directly.
 resource "aws_nat_gateway" "this" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public[0].id
@@ -78,6 +94,7 @@ resource "aws_nat_gateway" "this" {
   )
 }
 
+# Creates a route table for public subnets.
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -90,18 +107,22 @@ resource "aws_route_table" "public" {
   )
 }
 
+# Adds a default route (0.0.0.0/0) to the Internet Gateway in the public route table.
+# This allows public subnets to reach the internet.
 resource "aws_route" "public_internet_access" {
   route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.this.id
 }
 
+# Associates each public subnet with the public route table.
 resource "aws_route_table_association" "public" {
   count          = length(var.public_subnets)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
+# Creates a route table for private subnets.
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
 
@@ -114,12 +135,15 @@ resource "aws_route_table" "private" {
   )
 }
 
+# Adds a default route (0.0.0.0/0) to the NAT Gateway in the private route table.
+# This allows private subnets to access the internet via the NAT Gateway.
 resource "aws_route" "private_nat_gateway" {
   route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.this.id
 }
 
+# Associates each private subnet with the private route table.
 resource "aws_route_table_association" "private" {
   count          = length(var.private_subnets)
   subnet_id      = aws_subnet.private[count.index].id
