@@ -1,0 +1,23 @@
+name: Terraform CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform_version: 1.13.0
+      - name: terraform init
+        run: terraform init
+      - name: terraform plan
+        run: terraform plan -out=tfplan
+      - name: upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: tfplan
