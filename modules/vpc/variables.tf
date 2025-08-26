@@ -1,36 +1,68 @@
-variable "name" {}
-variable "vpc_cidr" {}
-variable "azs" { type = list(string) }
-variable "public_subnets" { type = list(string) }
-variable "private_subnets" { type = list(string) }
+variable "env" {
+  description = "Environment name"
+  type        = string
+}
 
-variable "enable_dns_support" { 
-    type = bool 
-    default = true 
-    }
+variable "cidr" {
+  description = "VPC CIDR block"
+  type        = string
+}
 
-variable "enable_dns_hostnames" { 
-    type = bool
-    default = true
-    }
+variable "azs" {
+  description = "List of availability zones"
+  type        = list(string)
+}
 
-variable "map_public_ip_on_launch" { 
-    type = bool
-    default = true
-    }
+variable "private_subnets" {
+  description = "List of private subnet CIDRs"
+  type        = list(string)
+}
 
-variable "tags" { 
-  type = map(string)
-  default = {}
-  }
+variable "public_subnets" {
+  description = "List of public subnet CIDRs"
+  type        = list(string)
+}
+
+variable "enable_nat_gateway" {
+  description = "Enable NAT Gateway"
+  type        = bool
+  default     = true
+}
+
+variable "single_nat_gateway" {
+  description = "Use a single NAT Gateway"
+  type        = bool
+  default     = true
+}
+
+variable "enable_dns_hostnames" {
+  description = "Enable DNS hostnames"
+  type        = bool
+  default     = true
+}
+
+variable "enable_dns_support" {
+  description = "Enable DNS support"
+  type        = bool
+  default     = true
+}
 
 variable "public_subnet_tags" {
-  type = map(string)
-  default = {}
-  }
+  description = "Tags for public subnets"
+  type        = map(string)
+}
 
 variable "private_subnet_tags" {
-  type = map(string)
-  default = {}
-  }
-  
+  description = "Tags for private subnets"
+  type        = map(string)
+}
+
+variable "tags" {
+  description = "Tags for resources"
+  type        = map(string)
+}
+
+variable "cluster_name" {
+  description = "EKS Cluster name"
+  type        = string
+}

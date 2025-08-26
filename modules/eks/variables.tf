@@ -1,25 +1,14 @@
-variable "cluster_name" {
-  description = "Name of the EKS cluster"
-  type        = string
-}
-
-variable "vpc_id" {
-  description = "VPC ID for the EKS cluster"
-  type        = string
-}
-
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs"
-  type        = list(string)
-}
-
-variable "node_groups" {
-  type = map(object({
-    desired_capacity = number
-    max_capacity     = number
-    min_capacity     = number
-    instance_types   = list(string)
-    capacity_type    = string
-  }))
-}
-
+variable "cluster_name" { type = string }
+variable "kubernetes_version" { type = string }
+variable "enable_cluster_creator_admin_permissions" { type = bool }
+variable "vpc_id" { type = string }
+variable "subnet_ids" { type = list(string) }
+variable "cluster_endpoint_public_access" { type = bool }
+variable "cluster_endpoint_private_access" { type = bool }
+variable "cluster_endpoint_public_access_cidrs" { type = list(string) }
+variable "cluster_enabled_log_types" { type = list(string) }
+variable "enable_irsa" { type = bool }
+variable "manage_aws_auth_configmap" { type = bool }
+variable "cluster_addons" { type = any }
+variable "eks_managed_node_groups" { type = any }
+variable "tags" { type = map(string) }

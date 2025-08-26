@@ -43,13 +43,20 @@ data "aws_eks_cluster_auth" "this" {
 
 # AWS VPC Module
 module "vpc" {
-  name = "dev-vpc"
-  source        = "../../modules/vpc"
-  vpc_cidr      = "10.10.0.0/16"
-  azs = data.aws_availability_zones.available.names
-  public_subnets = ["10.10.0.0/24", "10.10.1.0/24"]
-  private_subnets = ["10.10.10.0/24", "10.10.11.0/24"]
-  tags = { Name = "shopsphere-dev-vpc" }
+source = "../../modules/vpc"
+  env              = var.env
+  cidr             = var.cidr
+  azs              = var.azs
+  private_subnets  = var.private_subnets
+  public_subnets   = var.public_subnets
+  enable_nat_gateway   = var.enable_nat_gateway
+  single_nat_gateway   = var.single_nat_gateway
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
+  public_subnet_tags   = var.public_subnet_tags
+  private_subnet_tags  = var.private_subnet_tags
+  tags                = var.tags
+  cluster_name        = var.cluster_name  
 }
 
 #######################################################
@@ -59,108 +66,36 @@ module "vpc" {
 # AWS EKS Module. We are using EKS managed Node groups
 module "eks" {
   source = "../../modules/eks"
-  cluster_name = "shopsphere-dev-eks"
-  vpc_id = module.vpc.id
-  private_subnet_ids = module.vpc.private_subnets
-  node_groups = {
-    on_demand = {
-      desired_capacity = 2
-      max_capacity = 3
-      min_capacity = 2
-      instance_types = ["t3.medium"]
-      capacity_type = "ON_DEMAND"
-    }
-    spot_nodes = {
-      desired_capacity = 0
-      max_capacity = 4
-      min_capacity = 0
-      instance_types = ["m5.large", "t3.large"]
-      capacity_type = "SPOT"
-    }
-  }
-}
-
-# create IAM role for ALB (trust policy)
-resource "aws_iam_role" "alb_sa_role" {
-  name = "eks-alb-controller-role-dev"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = module.eks.oidc_provider_arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
-        }
-      }
-    }]
-  })
-}
-
-# Create the policy used by ALB controller
-resource "aws_iam_policy" "alb_policy" {
-  name = "ALBControllerPolicy-shopsphere-dev"
-  policy = file("${path.module}/../../modules/eks/policies/alb-controller-policy.json")
-}
-
-# Attach the policy to Role.
-resource "aws_iam_role_policy_attachment" "alb_attach" {
-  role       = aws_iam_role.alb_sa_role.name
-  policy_arn = aws_iam_policy.alb_policy.arn
+  cluster_name      = var.cluster_name
+  kubernetes_version = var.kubernetes_version
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+  cluster_endpoint_public_access  = var.cluster_endpoint_public_access
+  cluster_endpoint_private_access = var.cluster_endpoint_private_access
+  cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
+  cluster_enabled_log_types = var.cluster_enabled_log_types
+  enable_irsa = var.enable_irsa
+  manage_aws_auth_configmap = var.manage_aws_auth_configmap
+  cluster_addons = var.cluster_addons
+  eks_managed_node_groups = var.eks_managed_node_groups
+  tags = var.tags
 }
 
 #######################################################
-#    AWS Load Balancer Controller
+#    APPLICATION LOAD BALANCER - HELM 
 #######################################################
 
-# Install AWS Load Balancer Controller via Helm (uses IRSA role)
-resource "helm_release" "aws_lb_controller" {
-  name       = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  version    = "1.13.4"
+module "helm_alb" {
+  source = "../../modules/helm-alb"
 
-  set = [
-    {
-    name  = "clusterName"
-    value = module.eks.cluster_name
-  },
-
-    {
-    name  = "serviceAccount.create"
-    value = "false"
-  },
-
-    {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  },
-
-    {
-    name  = "region"
-    value = "us-east-1"
-  },
-
-    {
-    name  = "vpcId"
-    value = module.vpc.id
-  }
- ]
-}
-
-# Service account with the IRSA annotation
-resource "kubernetes_service_account" "aws_lb_controller" {
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.alb_sa_role.arn
-    }
-  }
+  cluster_name        = module.eks.cluster_name
+  region              = var.region
+  vpc_id              = module.vpc.vpc_id
+  oidc_provider_arn   = module.eks.oidc_provider_arn
+  alb_controller_chart_version = var.alb_controller_chart_version
+  env                 = var.env
+  project             = var.project
 }
 
 #######################################################
