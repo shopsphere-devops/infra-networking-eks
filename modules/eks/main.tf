@@ -53,7 +53,7 @@ module "eks" {
   enable_irsa = var.enable_irsa
 
   # Manage aws-auth ConfigMap automatically
-  manage_aws_auth_configmap = var.manage_aws_auth_configmap
+  # manage_aws_auth_configmap = var.manage_aws_auth_configmap
 
   # Core EKS Add-ons (AWS-managed)
   cluster_addons = var.cluster_addons
@@ -67,31 +67,6 @@ module "eks" {
   # Tags
   ##########################################################
   tags = var.tags
-}
-
-############################################################
-# Wire up Kubernetes & Helm providers AFTER cluster exists
-############################################################
-data "aws_eks_cluster" "this" {
-  name = module.eks.cluster_name
-}
-
-data "aws_eks_cluster_auth" "this" {
-  name = module.eks.cluster_name
-}
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.this.token
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = data.aws_eks_cluster.this.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.this.token
-  }
 }
 
 ############################################################

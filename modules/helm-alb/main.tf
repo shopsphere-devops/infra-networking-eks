@@ -80,7 +80,10 @@ module "alb_irsa_role" {
 # role_name_prefix: Prefix for the IAM role name.
   role_name_prefix = "${var.cluster_name}-alb"
 # attach_policy_arns: Attaches the policy created above.  
-  attach_policy_arns = [aws_iam_policy.alb_controller.arn]
+  role_policy_arns = {
+    alb_controller = aws_iam_policy.alb_controller.arn
+  }
+  
 
 # Connects the IAM role to the EKS cluster’s OIDC provider.
 # Restricts the role to be assumable only by the aws-load-balancer-controller service account in the kube-system namespace.
@@ -118,33 +121,35 @@ resource "helm_release" "aws_load_balancer_controller" {
 # set blocks: Passes required values to the Helm chart
 # This installs the controller with the correct permissions and configuration to manage AWS load balancers for your Kubernetes services.
 # clusterName, region, vpcId: Tells the controller which cluster and VPC to operate in.
-  set {
+  set = [
+    {
     name  = "clusterName"
     value = var.cluster_name
-  }
+  },
 
-  set {
+  {
     name  = "region"
     value = var.region
-  }
+  },
 
-  set {
+  {
     name  = "vpcId"
     value = var.vpc_id
-  }
+  },
 # serviceAccount.create: Tells Helm to create a service account.
-  set {
+  {
     name  = "serviceAccount.create"
     value = "true"
-  }
+  },
 # serviceAccount.name: Names the service account.
-  set {
+  {
     name  = "serviceAccount.name"
     value = "aws-load-balancer-controller"
-  }
+  },
 # serviceAccount.annotations.eks.amazonaws.com/role-arn: Annotates the service account with the IAM role ARN created above (enables IRSA).
-  set {
+  {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.alb_irsa_role.iam_role_arn
-  }
+  },
+ ]
 }

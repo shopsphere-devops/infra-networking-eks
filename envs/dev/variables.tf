@@ -14,7 +14,6 @@ variable "tags" { type = map(string) }
 variable "cluster_name" { type = string }
 
 # EKS Variables Placeholder
-variable "cluster_name" { type = string }
 variable "kubernetes_version" { type = string }
 variable "enable_cluster_creator_admin_permissions" { type = bool }
 variable "cluster_endpoint_public_access" { type = bool }
@@ -25,7 +24,6 @@ variable "enable_irsa" { type = bool }
 variable "manage_aws_auth_configmap" { type = bool }
 variable "cluster_addons" { type = any }
 variable "eks_managed_node_groups" { type = any }
-variable "tags" { type = map(string) }
 
 # ALB Variables Placeholder
 variable "region" { type = string }
@@ -34,8 +32,6 @@ variable "alb_controller_chart_version" {
   type    = string
   default = "1.8.1"
 }
-
-variable "env" {type = string }
 
 variable "project" {
   type    = string

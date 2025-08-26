@@ -12,7 +12,7 @@ provider "aws" {
 provider "helm" {
   kubernetes = {
     host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
     token                  = data.aws_eks_cluster_auth.this.token
   }
 }
@@ -20,7 +20,7 @@ provider "helm" {
 # The kubernetes provider is used for managing Kubernetes resources directly (like creating a ServiceAccount).
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  cluster_ca_certificate = base64decode(module.eks.cluster_ca_certificate)
   token                  = data.aws_eks_cluster_auth.this.token
 }
 
@@ -32,7 +32,12 @@ provider "kubernetes" {
 # We are fetching the AWS Availability Zones dynamically.
 data "aws_availability_zones" "available" {}
 
-# Fetching EKS Cluster AUth Details
+data "aws_eks_cluster" "this" {
+  name = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
+# Fetching EKS Cluster Auth Details
 data "aws_eks_cluster_auth" "this" {
   name = module.eks.cluster_name
 }
@@ -92,6 +97,7 @@ module "helm_alb" {
   cluster_name        = module.eks.cluster_name
   region              = var.region
   vpc_id              = module.vpc.vpc_id
+  cluster_ca_certificate = module.eks.cluster_ca_certificate
   oidc_provider_arn   = module.eks.oidc_provider_arn
   alb_controller_chart_version = var.alb_controller_chart_version
   env                 = var.env
