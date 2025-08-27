@@ -2,70 +2,14 @@
 # IAM Policy for AWS Load Balancer Controller
 ############################################################
 
-# This block creates an IAM policy document (in JSON) that allows the AWS Load Balancer Controller to perform a wide range of actions on AWS resources 
-# (like ELB, ACM, WAF, Shield, IAM, etc.).
-# The controller needs these permissions to create, modify, and delete AWS load balancers and related resources on behalf of your Kubernetes cluster.
-data "aws_iam_policy_document" "alb_controller" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "elasticloadbalancing:AddListenerCertificates",
-      "elasticloadbalancing:AddTags",
-      "elasticloadbalancing:CreateListener",
-      "elasticloadbalancing:CreateLoadBalancer",
-      "elasticloadbalancing:CreateRule",
-      "elasticloadbalancing:CreateTargetGroup",
-      "elasticloadbalancing:DeleteListener",
-      "elasticloadbalancing:DeleteLoadBalancer",
-      "elasticloadbalancing:DeleteRule",
-      "elasticloadbalancing:DeleteTargetGroup",
-      "elasticloadbalancing:DeregisterTargets",
-      "elasticloadbalancing:Describe*",
-      "elasticloadbalancing:ModifyListener",
-      "elasticloadbalancing:ModifyLoadBalancerAttributes",
-      "elasticloadbalancing:ModifyRule",
-      "elasticloadbalancing:ModifyTargetGroup",
-      "elasticloadbalancing:ModifyTargetGroupAttributes",
-      "elasticloadbalancing:RegisterTargets",
-      "elasticloadbalancing:RemoveListenerCertificates",
-      "elasticloadbalancing:RemoveTags",
-      "elasticloadbalancing:SetIpAddressType",
-      "elasticloadbalancing:SetRulePriorities",
-      "elasticloadbalancing:SetSecurityGroups",
-      "elasticloadbalancing:SetSubnets",
-      "elasticloadbalancing:SetWebAcl",
-      "iam:CreateServiceLinkedRole",
-      "iam:GetServerCertificate",
-      "iam:ListServerCertificates",
-      "cognito-idp:DescribeUserPoolClient",
-      "acm:DescribeCertificate",
-      "acm:ListCertificates",
-      "acm:GetCertificate",
-      "waf-regional:GetWebACL",
-      "waf-regional:GetWebACLForResource",
-      "waf-regional:AssociateWebACL",
-      "waf-regional:DisassociateWebACL",
-      "wafv2:GetWebACL",
-      "wafv2:GetWebACLForResource",
-      "wafv2:AssociateWebACL",
-      "wafv2:DisassociateWebACL",
-      "shield:DescribeProtection",
-      "shield:GetSubscriptionState",
-      "shield:DeleteProtection",
-      "shield:CreateProtection",
-      "shield:DescribeSubscription",
-      "shield:ListProtections"
-    ]
-    resources = ["*"]
-  }
-}
+# We have downloaded the official AWS Load Balancer Policy from https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+# iam_policy.json
 
-# This creates an actual IAM policy in AWS using the document above.
 # The policy will be attached to a role that the controller will use.
 resource "aws_iam_policy" "alb_controller" {
   name        = "${var.cluster_name}-alb-controller-policy"
   description = "IAM policy for AWS Load Balancer Controller"
-  policy      = data.aws_iam_policy_document.alb_controller.json
+  policy      = file("${path.module}/iam_policy.json")
 }
 
 ############################################################
