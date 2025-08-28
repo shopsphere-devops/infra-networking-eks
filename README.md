@@ -1,4 +1,4 @@
-# infra-networking-eks
+# infra-terraform
 
 ## Overview
 
