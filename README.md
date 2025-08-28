@@ -7,6 +7,7 @@ managing the core AWS infrastructure for our Kubernetes platform, including
 VPC, EKS cluster, ECR, and related networking components.
 
 envs/: Environment-specific configurations (e.g., dev, staging, prod).
+
 modules/: Reusable Terraform modules for VPC, EKS, ECR, and Helm-based ALB deployment.
 
 ## Usage
