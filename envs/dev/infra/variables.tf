@@ -37,3 +37,9 @@ variable "project" {
   type    = string
   default = "shopsphere"
 }
+
+variable "map_public_ip_on_launch" {
+  description = "Should be true to auto-assign public IPs in public subnets"
+  type        = bool
+  default     = false
+}

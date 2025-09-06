@@ -33,8 +33,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.24"
 
-  cluster_name                   = var.cluster_name
-  cluster_version                = var.kubernetes_version
+  cluster_name                             = var.cluster_name
+  cluster_version                          = var.kubernetes_version
   enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
 
   # VPC wiring from your vpc.tf
@@ -42,8 +42,8 @@ module "eks" {
   subnet_ids = var.subnet_ids
 
   # Endpoint & access
-  cluster_endpoint_public_access  = var.cluster_endpoint_public_access
-  cluster_endpoint_private_access = var.cluster_endpoint_private_access
+  cluster_endpoint_public_access       = var.cluster_endpoint_public_access
+  cluster_endpoint_private_access      = var.cluster_endpoint_private_access
   cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs
 
   # Logging

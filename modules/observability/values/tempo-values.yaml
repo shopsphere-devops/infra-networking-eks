@@ -1,0 +1,12 @@
+# This section configures the Grafana Tempo distributed tracing backend.
+tempo:
+  storage:
+    trace:
+      backend: local # This tells Tempo to use local disk storage for trace data.
+      # All traces are stored on the pod’s filesystem.
+      # This is simple and fine for dev/test, but not recommended for production
+      # (where you’d use object storage like S3, GCS, etc. for durability and scalability).
+  server:
+    http_listen_port: 3100 # This sets the HTTP server port for Tempo to 3100.
+    # This is the default port for Tempo’s HTTP API.
+    # Other services (like Grafana, or the OpenTelemetry Collector) will connect to Tempo on this port to send or query traces.

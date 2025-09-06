@@ -1,0 +1,37 @@
+# Fluent Bit is a lightweight log processor and forwarder.
+# You configure it with inputs (where logs come from), filters (how logs are processed), and outputs (where logs go).
+
+# In the Helm values file, we’re specifying the output configuration for Fluent Bit, telling it to send logs to Loki.
+
+config:
+  outputs: |
+    [OUTPUT]
+        Name            loki
+        Match           *
+        Uri             http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+        Labels          {job="fluent-bit"}
+
+# Name : loki
+# This tells Fluent Bit to use the Loki output plugin.
+
+# Match * : This means all logs processed by Fluent Bit will be sent to this output.
+# You could use a more specific match (e.g., kube.*) to filter which logs go to Loki.
+
+# Url http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+# This is the endpoint where Fluent Bit will send logs.
+# loki.monitoring.svc.cluster.local is the Kubernetes DNS name for the Loki service in the monitoring namespace.
+# 3100 is the default Loki HTTP port.
+# /loki/api/v1/push is the Loki API endpoint for pushing logs.
+
+# BatchWait 1
+# Fluent Bit will wait 1 second before sending a batch of logs to Loki.
+# This controls how frequently logs are sent.
+
+# BatchSize 102400
+# Fluent Bit will send logs in batches of up to 102,400 bytes (about 100 KB).
+# This controls the maximum size of each batch sent to Loki.
+
+# Labels {job="fluent-bit"}
+# This adds a label to every log entry sent to Loki.
+# In Loki, labels are used for querying and organizing logs.
+# Here, every log will have job="fluent-bit" attached.

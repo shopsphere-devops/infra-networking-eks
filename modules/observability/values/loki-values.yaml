@@ -1,0 +1,8 @@
+loki:
+  auth_enabled: false
+  storage:
+    type: "filesystem"
+  persistence:
+    enabled: false
+  emptyDir:
+    enabled: true

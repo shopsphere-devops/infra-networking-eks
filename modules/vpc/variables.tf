@@ -66,3 +66,9 @@ variable "cluster_name" {
   description = "EKS Cluster name"
   type        = string
 }
+
+variable "map_public_ip_on_launch" {
+  description = "Should be true to auto-assign public IPs in public subnets"
+  type        = bool
+  default     = false
+}
