@@ -96,5 +96,29 @@ module "ecr_repos" {
 #######################################################
 
 # RDS Postgres
-
-# Elastic Cache Redis
+module "rds" {
+  source     = "../../../modules/data-plane/rds"
+  name       = "shopsphere-dev"
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+  #eks_security_group_id = module.eks.cluster_primary_security_group_id
+  eks_security_group_id   = module.eks.node_security_group_id
+  tags                    = var.tags
+  allocated_storage       = 20
+  max_allocated_storage   = 100
+  multi_az                = false
+  backup_retention_period = 1
+  deletion_protection     = false
+  # Optional overrides
+  engine_version = "15.14"
+  instance_class = "db.t3.micro"
+  parameters = [
+    {
+      name         = "max_connections"
+      value        = "100"
+      apply_method = "pending-reboot"
+    }
+  ]
+  performance_insights_enabled = false
+  maintenance_window           = "Mon:00:00-Mon:03:00"
+}

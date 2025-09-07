@@ -17,3 +17,7 @@ output "vpc_id" {
 output "oidc_provider_arn" {
   value = module.eks.oidc_provider_arn
 }
+
+output "db_instance_endpoint" {
+  value = module.rds.db_instance_endpoint
+}
