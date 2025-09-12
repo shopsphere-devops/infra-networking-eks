@@ -1,8 +1,47 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "rds_kms_policy" {
+  statement {
+    sid    = "AllowAccount"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_caller_identity.current.account_id]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowRDSService"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
+    }
+    actions   = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+  }
+}
+
 # Creates a KMS key for encrypting your RDS instance and Performance Insights data.
 resource "aws_kms_key" "this" {
   description             = var.kms_description
   enable_key_rotation     = true # Key rotation is enabled for security.
   deletion_window_in_days = 7
+  policy                  = data.aws_iam_policy_document.rds_kms_policy.json
+}
+
+# Add a KMS Alias
+resource "aws_kms_alias" "this" {
+  name          = "alias/${var.name}-rds"
+  target_key_id = aws_kms_key.this.key_id
 }
 
 # Tells AWS which subnets (should be private) to use for RDS.
@@ -36,7 +75,11 @@ resource "random_password" "master" {
 # Securely stores the DB credentials in AWS Secrets Manager.
 resource "aws_secretsmanager_secret" "db" {
   name = "${var.name}-db-credentials"
+  #lifecycle {
+  #  prevent_destroy = true
+  #}
 }
+
 
 # Only output the secret ARN, never the actual password.
 resource "aws_secretsmanager_secret_version" "db" {

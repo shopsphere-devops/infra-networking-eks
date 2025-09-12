@@ -1,0 +1,85 @@
+image:
+  repository: public.ecr.aws/aws-observability/aws-otel-collector
+  tag: v0.42.0
+
+# Deploys the OpenTelemetry Collector as a Kubernetes Deployment (not DaemonSet or sidecar).
+# This means you’ll have a set of collector pods running centrally, typically as a gateway for traces/metrics.
+mode: deployment
+
+# Helm will create a Kubernetes ServiceAccount for the collector.
+serviceAccount:
+  create: true
+  name: otel-collector
+  # Annotates the ServiceAccount with the IAM role ARN (created via IRSA in Terraform). This allows the collector to authenticate to AWS and export traces to X-Ray.
+  annotations:
+    eks.amazonaws.com/role-arn: ${OTEL_ROLE_ARN}
+
+# This section configures the OpenTelemetry Collector’s pipeline using its native YAML syntax.
+config:
+  # Accepts telemetry data (traces, metrics, logs) using the OTLP protocol over HTTP and gRPC.
+  receivers:
+    otlp:
+      protocols:
+        http: {}
+        grpc: {}
+  # Prevents the collector from using too much memory (limits to 400 MiB, checks every second, spike limit 200 MiB).
+  processors:
+    memory_limiter:
+      check_interval: 1s
+      limit_mib: 400
+      spike_limit_mib: 200
+  # Batches telemetry data before exporting (max batch size 8192, timeout 5s).
+    batch:
+      send_batch_max_size: 8192
+      timeout: 5s
+  # Enriches telemetry data with Kubernetes metadata (pod name, namespace, node, pod UID).
+    k8sattributes:
+      extract:
+        metadata:
+          - k8s.pod.name
+          - k8s.namespace.name
+          - k8s.node.name
+          - k8s.pod.uid
+  # Logs telemetry data for debugging (at warn level).
+  exporters:
+    debug:
+      verbosity: normal
+    # Sends traces to AWS X-Ray (using IAM role via IRSA).
+    awsxray: {}
+  extensions:
+    # Adds a health check endpoint for Kubernetes liveness/readiness probes.
+    health_check: {}
+    # Enables performance profiling for the collector.
+    pprof: {}
+  service:
+    # Enables pprof and health_check extensions.
+    extensions: [pprof, health_check]
+    pipelines:
+      # Receives traces via OTLP, processes them (memory limit, enrich with k8s metadata, batch), exports to AWS X-Ray and logs.
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, batch]
+        exporters: [awsxray, debug]
+      # Receives metrics via OTLP, processes similarly, exports to logs (no AWS exporter for metrics here).
+      metrics:
+        receivers: [otlp]
+        processors: [memory_limiter, k8sattributes, batch]
+        exporters: [debug]
+
+# Enables preset configuration for Kubernetes attribute enrichment (makes it easier to add k8s metadata to telemetry).
+presets:
+  kubernetesAttributes:
+    enabled: true
+
+# Creates a ServiceMonitor CRD so Prometheus (via kube-prometheus-stack) can scrape the collector’s metrics.
+serviceMonitor:
+  enabled: true
+
+# Conclusion :
+# ServiceAccount is created and annotated with the IAM role ARN for IRSA.
+# OpenTelemetry Collector runs as a Deployment, acting as a gateway for traces and metrics.
+# Receivers accept telemetry data from instrumented apps via OTLP.
+# Processors enrich and batch data, and limit memory usage.
+# Exporters send traces to AWS X-Ray (using IAM role) and logs for debugging.
+# Extensions provide health checks and profiling.
+# Prometheus can scrape collector metrics via ServiceMonitor.

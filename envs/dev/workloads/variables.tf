@@ -30,3 +30,49 @@ variable "project" {
   type        = string
   default     = "shopsphere"
 }
+
+
+# ArgoCD Variables
+variable "argocd_release_name" {
+  description = "Argo CD Helm release name"
+  type        = string
+  default     = "argocd"
+}
+
+variable "argocd_namespace" {
+  description = "Namespace for Argo CD"
+  type        = string
+  default     = "argocd"
+}
+
+variable "argocd_chart_version" {
+  description = "Argo CD Helm chart version"
+  type        = string
+  default     = "5.51.6"
+}
+
+variable "argocd_values" {
+  description = "Values for Argo CD Helm chart"
+  type        = any
+  default     = {}
+}
+
+#######################################################
+#    External Secrets Operator (ESO)
+#######################################################
+
+/*variable "eso_irsa_role_arn" {
+  description = "IRSA role ARN for ESO"
+  type        = string
+}
+*/
+variable "kubeconfig_path" {
+  description = "Path to kubeconfig file"
+  type        = string
+}
+
+/*variable "db_secret_arn" {
+  description = "ARN of the RDS DB secret"
+  type        = string
+}
+*/

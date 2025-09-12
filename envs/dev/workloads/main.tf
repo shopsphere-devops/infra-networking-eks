@@ -62,16 +62,59 @@ module "helm_alb" {
 #    OBSERVABILITY
 #######################################################
 
+module "fluentbit_irsa_role" {
+  source            = "../../../modules/observability/iam/fluentbit-irsa"
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  namespace         = "observability"
+  name_prefix       = "shopsphere-dev"
+  service_account   = "fluent-bit"
+  # Add any other required variables for your IRSA module
+}
+
 module "observability" {
   source = "../../../modules/observability"
 
-  # Pass the cluster connection info to the module
-  # These are needed for the helm and kubernetes providers inside the module
-  cluster_endpoint          = data.terraform_remote_state.infra.outputs.cluster_endpoint
-  cluster_ca_certificate    = data.terraform_remote_state.infra.outputs.cluster_ca_certificate
-  cluster_token             = data.aws_eks_cluster_auth.this.token
-  alb_controller_dependency = module.helm_alb
+  namespace          = "observability"
+  name_prefix        = "shopsphere-dev"
+  cluster_name       = var.cluster_name
+  oidc_provider_arn  = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  tags               = var.tags
+  region             = var.region
+  fluentbit_role_arn = module.fluentbit_irsa_role.iam_role_arn
 
-  # Optionally, pass the namespace as a variable if you want to make it configurable
-  # monitoring_namespace     = "monitoring"
+  # If you want to override SA names or chart versions, set vars here
 }
+
+#######################################################
+#    External Secrets Operator (ESO)
+#######################################################
+
+module "eso" {
+  source               = "../../../modules/eso"
+  namespace            = "external-secrets"
+  chart_version        = "0.9.18"
+  service_account_name = "external-secrets"
+  #irsa_role_arn         = data.terraform_remote_state.infra.outputs.eso_irsa_role_arn
+  kubeconfig_path     = var.kubeconfig_path
+  secretsmanager_arns = [data.terraform_remote_state.infra.outputs.db_secret_arn]
+  eks_cluster_name    = var.cluster_name
+}
+
+/*
+#######################################################
+#    ARGO CD
+#######################################################
+
+module "argocd" {
+  source        = "../../../modules/argocd"
+  release_name  = var.argocd_release_name
+  namespace     = var.argocd_namespace
+  chart_version = var.argocd_chart_version
+  argocd_values = var.argocd_values
+}
+
+module "cert_manager" {
+  source = "../../../modules/cert-manager"
+}
+*/

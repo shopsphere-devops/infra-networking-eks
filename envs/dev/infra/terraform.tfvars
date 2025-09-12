@@ -112,6 +112,7 @@ eks_managed_node_groups = {
       ecr_readonly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
       cni_policy   = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
       worker_node  = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      ebs_csi      = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicy"
     }
     labels = {
       lifecycle = "on-demand"
@@ -135,6 +136,8 @@ eks_managed_node_groups = {
       ecr_readonly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
       cni_policy   = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
       worker_node  = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      #ebs_csi      = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicy"
+      ebs_csi = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
     }
     labels = {
       lifecycle = "spot"

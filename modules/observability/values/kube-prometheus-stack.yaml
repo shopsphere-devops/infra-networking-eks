@@ -1,0 +1,78 @@
+grafana:
+  # Sets the Grafana admin password to "admin" (should be changed for security, or use a Kubernetes secret).
+  adminPassword: "admin"
+  # Exposes Grafana internally in the cluster (not publicly accessible).
+  service:
+    type: ClusterIP
+  # No external ingress (ALB, NLB, etc.) yet; can be enabled later for public access and OAuth2 proxy integration.
+  ingress:
+    enabled: false # enable later with ALB/OAuth2 proxy
+  # Deploys default dashboards for Kubernetes, Prometheus, etc.
+  defaultDashboardsEnabled: true
+  sidecar:
+    # Enables automatic discovery and import of dashboards from ConfigMaps.
+    dashboards:
+      enabled: true
+    # Enables automatic discovery and import of datasources from ConfigMaps.
+    datasources:
+      enabled: true
+  persistence:
+    # Persists Grafana data (dashboards, users, etc.).
+    enabled: true
+    # Deploys Grafana as a Stateful Set for persistent storage.
+    type: statefulset
+    # Requests 10 Gi of storage
+    size: 10Gi
+    # Uses the gp 3 storage class (EBS gp3 volumes in AWS ).
+    storageClassName: gp3
+
+prometheus:
+  prometheusSpec:
+    # Prometheus will retain metrics data for 15 days.
+    retention: 15d
+    storageSpec:
+      # Configures persistent storage for Prometheus data.
+      volumeClaimTemplate:
+        spec:
+          # Uses AWS EBS gp3 volumes.
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            # Requests 50 Gi of storage for Prometheus.
+            requests:
+              storage: 50Gi
+  # Ensures ServiceMonitors defined in Helm values are used for scraping targets .
+  serviceMonitorSelectorNilUsesHelmValues: false
+  # Ensures PodMonitors defined in Helm values are used .
+  podMonitorSelectorNilUsesHelmValues: false
+
+alertmanager:
+  alertmanagerSpec:
+    # Configures persistent storage for Alertmanager ( stores silences, notifications, etc.).
+    storage:
+      volumeClaimTemplate:
+        spec:
+          # Uses AWS EBS gp3 volumes
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+kube-state-metrics:
+  # Allows all labels from pod metrics to be exported.
+  metricLabelsAllowlist:
+    - pods=["*"]
+
+# Expose ServiceMonitor CRD to scrape app namespaces later
+prometheusOperator:
+  # Ens ures the Prometheus Operator creates the ServiceMonitor CRD and other custom resources.
+  # This is necessary for scraping metrics from custom app namespaces and workloads.
+  createCustomResource: true
+
+# Conclusion :
+# Grafana: Visualizes metrics, dashboards, and alerts. Persisted and ready for future ingress/OAuth2 integration.
+# Prometheus: Scrapes metrics from Kubernetes and custom workloads, stores them for 15 days on persistent EBS storage.
+# Alertmanager: Handles alerts, notifications, and silences, with persistent storage.
+# kube-state-metrics: Exposes detailed Kubernetes object metrics, with all pod labels allowed .
+# Prometheus Operator : Manages Prometheus, Alertmanager, and CRDs for custom metric scraping.

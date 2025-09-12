@@ -1,0 +1,27 @@
+provider "helm" {
+  kubernetes = {
+    config_path = var.kubeconfig_path
+  }
+}
+
+resource "helm_release" "eso" {
+  name       = "external-secrets"
+  namespace  = var.namespace
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  version    = var.chart_version
+
+  create_namespace = true
+
+  set = [
+    {
+    name  = "serviceAccount.name"
+    value = var.service_account_name
+  },
+
+    {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = aws_iam_role.eso_irsa.arn
+  },
+  ]
+}

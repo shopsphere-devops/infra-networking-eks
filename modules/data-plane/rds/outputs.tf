@@ -13,3 +13,11 @@ output "db_secret_arn" {
 output "security_group_id" {
   value = aws_security_group.this.id
 }
+
+output "kms_key_arn" {
+  value = aws_kms_key.this.arn
+}
+
+output "kms_key_alias" {
+  value = aws_kms_alias.this.name
+}
