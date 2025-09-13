@@ -1,0 +1,95 @@
+name: Terraform Infra
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra-terraform/envs/dev/infra/**'
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout infra-terraform
+        uses: actions/checkout@v3
+        with:
+          path: infra-terraform
+
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform init
+
+      - name: Terraform Import Secret (idempotent for dev)
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform import -allow-missing 'module.rds.aws_secretsmanager_secret.db' arn:aws:secretsmanager:us-east-1:246412345195:secret:shopsphere-dev-db-credentials-SQgjt1 || true
+
+      - name: Terraform Format Check
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform plan -out=infra.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform apply -auto-approve infra.tfplan
+
+      - name: Get Terraform Outputs
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform output -json > tf-outputs-infra.json
+
+      # (Optional) Upload outputs as artifact for downstream workflows
+      - name: Upload Infra Outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: infra-outputs
+          path: infra-terraform/envs/dev/infra/tf-outputs-infra.json
+
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v3
+        with:
+          repository: shopsphere-devops/gitops-config
+          path: gitops-config
+          token: ${{ secrets.GITOPS_REPO_TOKEN }}
+
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          pip install yq
+
+      - name: Update Helm values.yaml
+        run: |
+          cd infra-terraform/envs/dev/infra
+          RDS_ENDPOINT=$(jq -r '.rds_endpoint.value' tf-outputs-infra.json)
+          cd ../../../..
+          cd gitops-config/app/dev/apps/catalog
+          yq e ".database.host = \"$RDS_ENDPOINT\"" -i values-db.yaml
+
+      - name: Commit and Push changes
+        run: |
+          cd gitops-config
+          git config user.name "abinash.sethi"
+          git config user.email "abinash.sethi@gmail.com"
+          git add app/dev/apps/catalog/values-db.yaml
+          git commit -m "Update DB endpoint from Terraform output"
+          git push

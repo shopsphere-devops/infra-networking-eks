@@ -1,0 +1,60 @@
+name: Terraform Workloads
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infra-terraform/envs/dev/workloads/**'
+
+jobs:
+  workloads:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout infra-terraform
+        uses: actions/checkout@v3
+        with:
+          path: infra-terraform
+
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform init
+
+      - name: Terraform Format Check
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform plan -out=workloads.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform apply -auto-approve workloads.tfplan
+
+      - name: Get Terraform Outputs
+        run: |
+          cd infra-terraform/envs/dev/workloads
+          terraform output -json > tf-outputs-workloads.json
+
+      # (Optional) Upload outputs as artifact for downstream workflows
+      - name: Upload Workloads Outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: workloads-outputs
+          path: infra-terraform/envs/dev/workloads/tf-outputs-workloads.json
