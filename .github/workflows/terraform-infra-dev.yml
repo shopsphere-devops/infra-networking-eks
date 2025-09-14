@@ -27,6 +27,9 @@ jobs:
       - name: Debug AWS Credentials
         run: aws sts get-caller-identity
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Terraform Init
         run: |
           cd infra-terraform/envs/dev/infra
