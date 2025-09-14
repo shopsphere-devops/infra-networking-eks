@@ -24,7 +24,7 @@ jobs:
           role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
           aws-region: us-east-1
 
-      - name: Debug AWS Credentials
+      - name: Confirm AWS Credentials
         run: aws sts get-caller-identity
 
       - name: Setup Terraform
