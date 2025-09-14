@@ -32,6 +32,11 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform init
 
+      - name: Remove Secret from Terraform State
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform state rm 'module.rds.aws_secretsmanager_secret.db' || true
+
       - name: Terraform Destroy
         run: |
           cd infra-terraform/envs/dev/infra
