@@ -38,7 +38,12 @@ jobs:
       - name: Terraform Import Secret (idempotent for dev)
         run: |
           cd infra-terraform/envs/dev/infra
-          terraform import -allow-missing 'module.rds.aws_secretsmanager_secret.db' arn:aws:secretsmanager:us-east-1:246412345195:secret:shopsphere-dev-db-credentials-SQgjt1 || true
+          terraform import 'module.rds.aws_secretsmanager_secret.db' arn:aws:secretsmanager:us-east-1:246412345195:secret:shopsphere-dev-db-credentials-SQgjt1 || true
+
+      - name: Confirm Terraform Secret Import
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform state list | grep module.rds.aws_secretsmanager_secret.db
 
       - name: Terraform Format Check
         run: |

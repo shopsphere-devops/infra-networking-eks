@@ -1,0 +1,22 @@
+name: Terraform Infra Destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
+          aws-region: us-east-1
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform Destroy
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform destroy -auto-approve

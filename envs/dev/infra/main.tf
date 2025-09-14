@@ -4,8 +4,8 @@
 
 # Use the AWS Provider and the AWS Profile is dev-sso
 provider "aws" {
-  region  = "us-east-1"
-  profile = "dev-sso"
+  region = "us-east-1"
+  #profile = "dev-sso"
 }
 
 #######################################################
