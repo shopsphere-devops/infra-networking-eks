@@ -114,5 +114,5 @@ jobs:
           git config user.name "abinash.sethi"
           git config user.email "abinash.sethi@gmail.com"
           git add app/dev/apps/catalog/values-db.yaml
-          git commit -m "Update DB endpoint from Terraform output"
+          git commit -m "Update DB endpoint from Terraform output" || true
           git push

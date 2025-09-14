@@ -67,12 +67,14 @@ module "eks" {
   # Tags
   ##########################################################
   tags = var.tags
-}
+
 
 ############################################################
 # (Optional) Map extra roles/users into aws-auth
 # module.eks supports this via aws_auth_* variables.
 ############################################################
+  access_entries = var.access_entries
+}
 /*
 access_entries = {
     sso_admin = {
