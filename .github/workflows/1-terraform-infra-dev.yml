@@ -95,6 +95,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
+      - name: Check for rds_endpoint in Terraform Outputs
+        run: |
+          cd infra-terraform/envs/dev/infra
+          grep rds_endpoint tf-outputs-infra.json
+
       - name: Update Helm values.yaml
         run: |
           cd infra-terraform/envs/dev/infra
