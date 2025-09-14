@@ -85,11 +85,15 @@ jobs:
           path: gitops-config
           token: ${{ secrets.GITOPS_REPO_TOKEN }}
 
-      - name: Install jq and yq
+      - name: Install Go yq
+        run: |
+            sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/bin/yq
+            sudo chmod +x /usr/bin/yq
+
+      - name: Install jq
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
-          pip install yq
 
       - name: Update Helm values.yaml
         run: |
