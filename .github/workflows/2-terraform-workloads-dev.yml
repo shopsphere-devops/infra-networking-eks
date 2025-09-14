@@ -30,16 +30,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Install kubectl and awscli
+      - name: Install kubectl
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl unzip
-          # Install kubectl
           sudo apt-get install -y kubectl
-          # Install AWS CLI v2
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
           aws --version
 
       - name: Update kubeconfig for EKS
