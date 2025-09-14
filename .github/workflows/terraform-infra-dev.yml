@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout infra-terraform
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: infra-terraform
 
@@ -65,7 +65,7 @@ jobs:
           path: infra-terraform/envs/dev/infra/tf-outputs-infra.json
 
       - name: Checkout GitOps repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: shopsphere-devops/gitops-config
           path: gitops-config
