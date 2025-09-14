@@ -9,6 +9,9 @@ on:
 jobs:
   infra:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout infra-terraform
         uses: actions/checkout@v4
@@ -20,6 +23,9 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
           aws-region: us-east-1
+
+      - name: Debug AWS Credentials
+        run: aws sts get-caller-identity
 
       - name: Terraform Init
         run: |
