@@ -4,18 +4,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  destroy:
+  destroy-infra:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Checkout infra-terraform
+        uses: actions/checkout@v4
+        with:
+          path: infra-terraform
+
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::246412345195:role/github-actions-deploy-role
           aws-region: us-east-1
-      - uses: hashicorp/setup-terraform@v3
+
+      - name: Confirm AWS Credentials
+        run: aws sts get-caller-identity
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          cd infra-terraform/envs/dev/infra
+          terraform init
+
       - name: Terraform Destroy
         run: |
           cd infra-terraform/envs/dev/infra

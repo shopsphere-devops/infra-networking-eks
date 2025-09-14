@@ -12,9 +12,14 @@ variable "manage_aws_auth_configmap" { type = bool }
 variable "cluster_addons" { type = any }
 variable "eks_managed_node_groups" { type = any }
 variable "tags" { type = map(string) }
-
-variable "access_entries" {
-  description = "Map of access entries for aws-auth"
-  type        = map(any)
-  default     = {}
+/*
+variable "aws_auth_roles" {
+  description = "List of role mappings for aws-auth configmap"
+  type        = list(object({
+    rolearn  = string
+    username = string
+    groups   = list(string)
+  }))
+  default     = []
 }
+*/

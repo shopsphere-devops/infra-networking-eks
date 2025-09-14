@@ -145,16 +145,15 @@ eks_managed_node_groups = {
     }
   }
 }
-
-access_entries = {
-  sso_admin = {
-    kubernetes_groups = ["system:masters"]
-    principal_arn     = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
-    username          = "admin"
+/*
+aws_auth_roles = [
+  {
+    rolearn  = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
+    username = "admin"
+    groups   = ["system:masters"]
   }
-  # Add more entries as needed
-}
-
+]
+*/
 
 #######################################################
 #    RDS

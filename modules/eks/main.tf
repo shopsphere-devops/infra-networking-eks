@@ -73,7 +73,7 @@ module "eks" {
 # (Optional) Map extra roles/users into aws-auth
 # module.eks supports this via aws_auth_* variables.
 ############################################################
-  access_entries = var.access_entries
+  #aws_auth_roles = var.aws_auth_roles
 }
 /*
 access_entries = {
