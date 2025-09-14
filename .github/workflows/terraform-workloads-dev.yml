@@ -54,7 +54,7 @@ jobs:
 
       # (Optional) Upload outputs as artifact for downstream workflows
       - name: Upload Workloads Outputs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: workloads-outputs
           path: infra-terraform/envs/dev/workloads/tf-outputs-workloads.json
