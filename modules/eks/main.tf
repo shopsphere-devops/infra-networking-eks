@@ -73,13 +73,14 @@ module "eks" {
 # (Optional) Map extra roles/users into aws-auth
 # module.eks supports this via aws_auth_* variables.
 ############################################################
-# module "eks" {
-#   ...
-#   aws_auth_roles = [
-#     {
-#       rolearn  = "arn:aws:iam::123456789012:role/sre-admin"
-#       username = "sre-admin"
-#       groups   = ["system:masters"]
-#     }
-#   ]
-# }
+/*
+access_entries = {
+    sso_admin = {
+      kubernetes_groups = ["system:masters"]
+      principal_arn     = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
+      username          = "admin"
+    }
+    # Add more entries as needed
+  }
+}
+*/

@@ -70,8 +70,10 @@ module "eks" {
   cluster_addons                           = var.cluster_addons
   eks_managed_node_groups                  = var.eks_managed_node_groups
   tags                                     = var.tags
-}
 
+  # Map extra roles/users into aws-auth module.eks supports this via aws_auth_* variables.
+  access_entries = var.access_entries
+}
 #######################################################
 #    AWS ECR
 #######################################################
