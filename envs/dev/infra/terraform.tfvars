@@ -150,7 +150,7 @@ access_entries = {
   # GitHub Actions role gets cluster-admin automatically because it created the cluster
   # Add your federated identity as well
   admin-abinash = {
-    principal_arn = "arn:aws:iam::246412345195:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815/abinash.sethi"
+    principal_arn = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
     type          = "STANDARD"
 
     policy_associations = {
