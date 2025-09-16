@@ -148,7 +148,7 @@ eks_managed_node_groups = {
 
 access_entries = {
   "abinash-admin" = {
-    principal_arn     = "arn:aws:iam::246412345195:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
+    principal_arn     = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
     kubernetes_groups = []
     access_level      = "cluster-admin"
   }
