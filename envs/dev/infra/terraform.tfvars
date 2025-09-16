@@ -147,22 +147,18 @@ eks_managed_node_groups = {
 }
 
 access_entries = {
-  # GitHub Actions role gets cluster-admin automatically because it created the cluster
-  # Add your federated identity as well
-  admin-abinash = {
-    principal_arn = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
+  eks_admin = {
+    principal_arn = aws_iam_role.eks_admin.arn
     type          = "STANDARD"
-
     policy_associations = {
       admin = {
-        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-        access_scope = {
-          type = "cluster"
-        }
+        policy_arn   = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        access_scope = { type = "cluster" }
       }
     }
   }
 }
+
 
 
 #######################################################
