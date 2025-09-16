@@ -145,15 +145,16 @@ eks_managed_node_groups = {
     }
   }
 }
-/*
-aws_auth_roles = [
+
+access_entries = [
   {
-    rolearn  = "arn:aws:iam::246412345195:role/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
-    username = "admin"
-    groups   = ["system:masters"]
+    principal_arn     = "arn:aws:iam::246412345195:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_6a55a17fdf06e815"
+    kubernetes_groups = ["system:masters"]
+    access_level      = "cluster-admin"
   }
+  # Add more entries as needed
 ]
-*/
+
 
 #######################################################
 #    RDS

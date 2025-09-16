@@ -72,7 +72,7 @@ module "eks" {
   tags                                     = var.tags
 
   # Map extra roles/users into aws-auth module.eks supports this via aws_auth_* variables.
-  #aws_auth_roles = var.aws_auth_roles
+  access_entries = var.access_entries
 }
 #######################################################
 #    AWS ECR

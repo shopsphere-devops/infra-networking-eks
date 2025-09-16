@@ -24,17 +24,17 @@ variable "enable_irsa" { type = bool }
 variable "manage_aws_auth_configmap" { type = bool }
 variable "cluster_addons" { type = any }
 variable "eks_managed_node_groups" { type = any }
-/*
-variable "aws_auth_roles" {
-  description = "List of role mappings for aws-auth configmap"
+
+variable "access_entries" {
+  description = "List of role mappings for configmap"
   type = list(object({
-    rolearn  = string
-    username = string
-    groups   = list(string)
+    principal_arn     = string
+    kubernetes_groups = list(string)
+    access_level      = string
   }))
   default = []
 }
-*/
+
 # ALB Variables Placeholder
 variable "region" { type = string }
 
