@@ -72,7 +72,18 @@ module "eks" {
   tags                                     = var.tags
 
   # Map extra roles/users into aws-auth module.eks supports this via aws_auth_* variables.
-  access_entries = var.access_entries
+  access_entries = {
+    eks_admin = {
+      principal_arn = aws_iam_role.eks_admin.arn
+      type          = "STANDARD"
+      policy_associations = {
+        admin = {
+          policy_arn   = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = { type = "cluster" }
+        }
+      }
+    }
+  }
 }
 #######################################################
 #    AWS ECR
