@@ -14,11 +14,11 @@ variable "eks_managed_node_groups" { type = any }
 variable "tags" { type = map(string) }
 
 variable "access_entries" {
-  description = "List of role mappings for configmap"
-  type        = list(object({
-    principal_arn  = string
-    kubernetes_groups   = list(string)
-    access_level = string
+  description = "Map of role mappings for configmap"
+  type        = map(object({
+    principal_arn     = string
+    kubernetes_groups = list(string)
+    access_level      = string
   }))
-  default     = []
+  default     = {}
 }
