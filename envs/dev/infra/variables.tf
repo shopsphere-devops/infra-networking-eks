@@ -26,13 +26,9 @@ variable "cluster_addons" { type = any }
 variable "eks_managed_node_groups" { type = any }
 
 variable "access_entries" {
-  description = "Map of role mappings for configmap"
-  type = map(object({
-    principal_arn     = string
-    kubernetes_groups = list(string)
-    access_level      = string
-  }))
-  default = {}
+  description = "EKS access entries for managing cluster access (IAM principals → EKS RBAC)."
+  type        = any
+  default     = {}
 }
 
 # ALB Variables Placeholder
