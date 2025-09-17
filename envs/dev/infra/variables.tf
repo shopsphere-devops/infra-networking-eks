@@ -49,3 +49,15 @@ variable "map_public_ip_on_launch" {
   type        = bool
   default     = false
 }
+
+# Route53
+variable "route53_zone_id" {
+  description = "The Route53 Hosted Zone ID for your domain"
+  type        = string
+}
+
+variable "argocd_domain" {
+  description = "The FQDN for ArgoCD ingress"
+  type        = string
+  default     = "argocd.hellosaanvika.com"
+}

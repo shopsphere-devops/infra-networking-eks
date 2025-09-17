@@ -71,20 +71,6 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform output -json > tf-outputs-infra.json
 
-      # (Optional) Upload outputs as artifact for downstream workflows
-      - name: Upload Infra Outputs
-        uses: actions/upload-artifact@v4
-        with:
-          name: infra-outputs
-          path: infra-terraform/envs/dev/infra/tf-outputs-infra.json
-
-      - name: Checkout GitOps repo
-        uses: actions/checkout@v4
-        with:
-          repository: shopsphere-devops/gitops-config
-          path: gitops-config
-          token: ${{ secrets.GITOPS_REPO_TOKEN }}
-
       - name: Install Go yq
         run: |
             sudo wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/bin/yq
@@ -94,6 +80,31 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
+
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: shopsphere-devops/gitops-config
+          path: gitops-config
+          token: ${{ secrets.GITOPS_REPO_TOKEN }}
+
+      - name: Extract ACM ARN from Terraform Outputs
+        id: acm
+        run: |
+          ACM_CERT_ARN=$(jq -r '.acm_cert_arn.value' infra-terraform/envs/dev/infra/tf-outputs-infra.json)
+          echo "acm_cert_arn=$ACM_CERT_ARN" >> $GITHUB_OUTPUT
+
+      - name: Render argocd-ingress.yaml from template
+        run: |
+          export ACM_CERT_ARN="${{ steps.acm.outputs.acm_cert_arn }}"
+          envsubst < gitops-config/app/dev/cluster-config/argocd-ingress.yaml.tpl > gitops-config/app/dev/cluster-config/argocd-ingress.yaml
+
+      # (Optional) Upload outputs as artifact for downstream workflows
+      - name: Upload Infra Outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: infra-outputs
+          path: infra-terraform/envs/dev/infra/tf-outputs-infra.json
 
       - name: Check for rds_endpoint in Terraform Outputs
         run: |
@@ -108,11 +119,20 @@ jobs:
           cd gitops-config/app/dev/apps/catalog
           yq e ".database.host = \"$RDS_ENDPOINT\"" -i values-db.yaml
 
-      - name: Commit and Push changes
+      - name: Commit and Push DB endpoint
         run: |
           cd gitops-config
           git config user.name "abinash.sethi"
           git config user.email "abinash.sethi@gmail.com"
           git add app/dev/apps/catalog/values-db.yaml
           git commit -m "Update DB endpoint from Terraform output" || true
+          git push
+
+      - name: Commit and Push ACM ARN in ArgoCD Ingress
+        run: |
+          cd gitops-config
+          git config user.name "abinash.sethi"
+          git config user.email "abinash.sethi@gmail.com"
+          git add app/dev/cluster-config/argocd-ingress.yaml
+          git commit -m "Update ACM ARN in ArgoCD Ingress from Terraform output" || true
           git push

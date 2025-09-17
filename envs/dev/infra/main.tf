@@ -8,6 +8,14 @@ provider "aws" {
   #profile = "dev-sso"
 }
 
+provider "aws" {
+  alias  = "dns"
+  region = "us-east-1"
+  assume_role {
+    role_arn = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+  }
+}
+
 #######################################################
 #    DATA BLOCK
 #######################################################
@@ -134,4 +142,28 @@ module "rds" {
   ]
   performance_insights_enabled = false
   maintenance_window           = "Mon:00:00-Mon:03:00"
+}
+
+#######################################################
+#    AWS Certificate Manager
+#######################################################
+
+module "acm" {
+  source      = "../../../modules/acm"
+  domain_name = "argocd.hellosaanvika.com"
+  zone_id     = var.route53_zone_id
+}
+
+#######################################################
+#    Route53
+#######################################################
+
+module "dns" {
+  source       = "../../../modules/dns"
+  providers    = { aws = aws.dns }
+  zone_id      = var.route53_zone_id
+  record_name  = var.argocd_domain
+  record_type  = "CNAME"
+  record_value = module.alb.dns_name # Replace with your ALB's DNS name output
+  ttl          = 300
 }

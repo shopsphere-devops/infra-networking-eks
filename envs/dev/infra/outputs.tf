@@ -25,3 +25,7 @@ output "db_secret_arn" {
 output "rds_endpoint" {
   value = module.rds.db_instance_endpoint
 }
+
+output "acm_cert_arn" {
+  value = module.acm.certificate_arn
+}
