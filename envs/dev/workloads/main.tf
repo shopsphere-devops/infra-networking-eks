@@ -101,7 +101,6 @@ module "eso" {
   eks_cluster_name    = var.cluster_name
 }
 
-/*
 #######################################################
 #    ARGO CD
 #######################################################
@@ -117,4 +116,3 @@ module "argocd" {
 module "cert_manager" {
   source = "../../../modules/cert-manager"
 }
-*/
