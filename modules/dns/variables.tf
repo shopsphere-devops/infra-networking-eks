@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 3.0"
-    }
-  }
-}
-
 variable "zone_id" {
   description = "The Route53 Hosted Zone ID"
   type        = string

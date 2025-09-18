@@ -1,5 +1,10 @@
-provider "aws" {
-  # No config, just to allow passing the provider from parent
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 3.0"
+    }
+  }
 }
 
 resource "aws_route53_record" "this" {
