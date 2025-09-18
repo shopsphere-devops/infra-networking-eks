@@ -8,6 +8,14 @@ provider "aws" {
   #profile = "dev-sso"
 }
 
+provider "aws" {
+  alias  = "dns"
+  region = "us-east-1"
+  assume_role {
+    role_arn = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+  }
+}
+
 # The kubernetes provider is used for managing Kubernetes resources directly (like creating a ServiceAccount).
 provider "kubernetes" {
   host                   = data.terraform_remote_state.infra.outputs.cluster_endpoint
