@@ -8,6 +8,12 @@ provider "aws" {
   #profile = "dev-sso"
 }
 
+# Provider with alias for Route53 (if needed in ACM/DNS)
+provider "aws" {
+  alias  = "dns"
+  region = "us-east-1"
+}
+/*
 provider "aws" {
   alias  = "dns"
   region = "us-east-1"
@@ -15,7 +21,7 @@ provider "aws" {
     role_arn = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
   }
 }
-
+*/
 #######################################################
 #    DATA BLOCK
 #######################################################
@@ -156,15 +162,4 @@ module "acm" {
   }
   domain_name = "argocd.hellosaanvika.com"
   zone_id     = var.route53_zone_id
-}
-
-
-module "dns" {
-  source       = "../../../modules/dns"
-  providers    = { aws = aws.dns }
-  zone_id      = var.route53_zone_id
-  record_name  = var.argocd_domain
-  record_type  = "CNAME"
-  record_value = module.alb.dns_name # Replace with your ALB's DNS name output
-  ttl          = 300
 }
