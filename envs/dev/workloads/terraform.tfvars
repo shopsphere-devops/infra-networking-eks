@@ -43,3 +43,10 @@ argocd_values = {
 #    External Secrets Operator (ESO)
 #######################################################
 kubeconfig_path = "~/.kube/config"
+
+#######################################################
+#    Route53
+#######################################################
+
+route53_zone_id = "Z0268706UU9TQZA0BBT4" # <-- Replace with your actual Hosted Zone ID
+argocd_domain   = "argocd.hellosaanvika.com"

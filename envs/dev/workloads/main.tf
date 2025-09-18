@@ -112,7 +112,22 @@ module "argocd" {
   chart_version = var.argocd_chart_version
   argocd_values = var.argocd_values
 }
-
+/*
 module "cert_manager" {
   source = "../../../modules/cert-manager"
+}
+*/
+
+#######################################################
+#    Route53
+#######################################################
+
+module "dns" {
+  source       = "../../../modules/dns"
+  providers    = { aws = aws.dns }
+  zone_id      = var.route53_zone_id
+  record_name  = var.argocd_domain
+  record_type  = "CNAME"
+  record_value = module.alb.dns_name # Replace with your ALB's DNS name output
+  ttl          = 300
 }
