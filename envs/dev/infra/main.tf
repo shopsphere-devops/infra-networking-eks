@@ -150,7 +150,6 @@ module "rds" {
 
 module "acm" {
   source      = "../../../modules/acm"
-  providers   = { aws = aws.dns }
   domain_name = "argocd.hellosaanvika.com"
   zone_id     = var.route53_zone_id
 }
