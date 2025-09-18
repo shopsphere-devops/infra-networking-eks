@@ -6,12 +6,15 @@ resource "aws_acm_certificate" "this" {
   }
 }
 
-# Static index [0]. Use the terraform-aws-acm community module for the recommended way for production use.
+locals {
+  dvo = tolist(aws_acm_certificate.this.domain_validation_options)[0]
+}
+
 resource "aws_route53_record" "validation" {
   zone_id = var.zone_id
-  name    = aws_acm_certificate.this.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.this.domain_validation_options[0].resource_record_type
-  records = [aws_acm_certificate.this.domain_validation_options[0].resource_record_value]
+  name    = local.dvo.resource_record_name
+  type    = local.dvo.resource_record_type
+  records = [local.dvo.resource_record_value]
   ttl     = 60
 }
 
