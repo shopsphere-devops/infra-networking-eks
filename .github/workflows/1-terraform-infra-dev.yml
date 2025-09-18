@@ -37,9 +37,7 @@ jobs:
 
       - name: Replace provider for ACM resources
         run: |
-          terraform state replace-provider \
-          'module.acm.provider["registry.terraform.io/hashicorp/aws"].dns' \
-          'provider["registry.terraform.io/hashicorp/aws"]'
+          terraform state replace-provider 'module.acm.provider["registry.terraform.io/hashicorp/aws"].dns' 'provider["registry.terraform.io/hashicorp/aws"]'
 
       - name: Terraform Import Secret (idempotent for dev)
         run: |
