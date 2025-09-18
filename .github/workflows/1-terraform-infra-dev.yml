@@ -38,7 +38,6 @@ jobs:
       - name: Terraform rm ACM
         run: |
           cd infra-terraform/envs/dev/infra
-          terraform state rm module.acm.aws_acm_certificate.this
           terraform state rm module.acm.aws_route53_record.validation
           exit 0
 
