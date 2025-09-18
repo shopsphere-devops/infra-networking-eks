@@ -35,11 +35,12 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform init
 
-      - name: Terraform version & providers
+      - name: Terraform version, providers, state list
         run: |
           cd infra-terraform/envs/dev/infra
           terraform version
           terraform providers
+          terraform state list
 
       - name: Replace provider for ACM resources
         run: |
