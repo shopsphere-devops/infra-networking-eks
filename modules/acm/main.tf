@@ -1,3 +1,10 @@
+# Aliased provider for Route53 (us-east-1 is required for ACM validation)
+provider "aws" {
+  alias  = "dns"
+  region = "us-east-1"
+}
+
+
 terraform {
   required_providers {
     aws = {
