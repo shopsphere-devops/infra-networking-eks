@@ -35,16 +35,10 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform init
 
-      - name: Terraform version, providers, state list
+      - name: Terraform rm ACM
         run: |
           cd infra-terraform/envs/dev/infra
-          terraform version
-          terraform providers
-          terraform state list
-
-      - name: Replace provider for ACM resources
-        run: |
-          terraform state replace-provider 'module.acm.provider["registry.terraform.io/hashicorp/aws"].dns' 'provider["registry.terraform.io/hashicorp/aws"]'
+          terraform state rm module.acm.aws_acm_certificate.this
 
       - name: Terraform Import Secret (idempotent for dev)
         run: |

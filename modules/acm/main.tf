@@ -29,7 +29,7 @@ locals {
 # Creates a DNS record in your Route53 hosted zone (var.zone_id) with the name, type, and value provided by ACM.
 # This record proves to ACM that you control the domain, allowing ACM to issue the certificate.
 resource "aws_route53_record" "validation" {
-  #provider = aws.dns
+  provider = aws.dns
   zone_id = var.zone_id
   name    = local.dvo.resource_record_name
   type    = local.dvo.resource_record_type
