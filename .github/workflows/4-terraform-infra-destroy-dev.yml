@@ -32,17 +32,6 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform init
 
-      - name : Terraform State Pull
-        run :  |
-          cd infra-terraform/envs/dev/infra
-          terraform state pull > state.json
-          cat state.json
-
-      - name: Terraform State RM  Route53
-        run: |
-          cd infra-terraform/envs/dev/infra
-          terraform state rm module.acm.aws_route53_record.validation
-
       - name: Remove Secret from Terraform State
         run: |
           cd infra-terraform/envs/dev/infra
