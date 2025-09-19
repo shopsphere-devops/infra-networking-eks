@@ -131,13 +131,13 @@ module "cert_manager" {
 
 module "dns" {
   source       = "../../../modules/dns"
-  zone_id      = var.route53_zone_id  # mgmt account hosted zone ID
-  record_name  = var.argocd_domain    # e.g. "argocd"
+  zone_id      = var.route53_zone_id # mgmt account hosted zone ID
+  record_name  = var.argocd_domain   # e.g. "argocd"
   record_type  = "CNAME"
-  record_value = module.alb.dns_name  # ALB dns_name output from ALB module
+  record_value = module.alb.dns_name # ALB dns_name output from ALB module
   ttl          = 300
 
-  providers    = {
-    aws = aws.dns     # # ensure the module's Route53 resource runs in mgmt account
-    }
+  providers = {
+    aws = aws.dns # # ensure the module's Route53 resource runs in mgmt account
+  }
 }
