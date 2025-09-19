@@ -155,7 +155,7 @@ module "acm" {
   zone_id     = var.route53_zone_id
 
   providers = {
-    aws      = aws
-    aws.dns  = aws.dns
+    aws     = aws
+    aws.dns = aws.dns
   }
 }
