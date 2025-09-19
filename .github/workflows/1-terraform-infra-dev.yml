@@ -88,16 +88,16 @@ jobs:
           path: gitops-config
           token: ${{ secrets.GITOPS_REPO_TOKEN }}
 
-      - name: Extract ACM ARN from Terraform Outputs
-        id: acm
+      - name: Get ACM Certificate ARN
         run: |
-          ACM_CERT_ARN=$(jq -r '.acm_cert_arn.value' infra-terraform/envs/dev/infra/tf-outputs-infra.json)
-          echo "acm_cert_arn=$ACM_CERT_ARN" >> $GITHUB_OUTPUT
+          cd infra-terraform/envs/dev/infra
+          ACM_CERT_ARN=$(terraform output -raw acm_certificate_arn)
+          echo "ACM_CERT_ARN=$ACM_CERT_ARN" >> $GITHUB_ENV
 
-      - name: Render argocd-ingress.yaml from template
+      - name: Render ArgoCD ingress manifest
         run: |
-          export ACM_CERT_ARN="${{ steps.acm.outputs.acm_cert_arn }}"
-          envsubst < gitops-config/app/dev/cluster-config/argocd-ingress.yaml.tpl > gitops-config/app/dev/cluster-config/argocd-ingress.yaml
+          cd gitops-config/app/dev/cluster-config
+          envsubst < argocd-ingress.yaml.tpl > argocd-ingress.yaml
 
       # (Optional) Upload outputs as artifact for downstream workflows
       - name: Upload Infra Outputs
@@ -119,20 +119,12 @@ jobs:
           cd gitops-config/app/dev/apps/catalog
           yq e ".database.host = \"$RDS_ENDPOINT\"" -i values-db.yaml
 
-      - name: Commit and Push DB endpoint
+      - name: Commit and Push DB endpoint & ACM ARN in ArgoCD Ingress
         run: |
           cd gitops-config
           git config user.name "abinash.sethi"
           git config user.email "abinash.sethi@gmail.com"
           git add app/dev/apps/catalog/values-db.yaml
-          git commit -m "Update DB endpoint from Terraform output" || true
-          git push
-
-      - name: Commit and Push ACM ARN in ArgoCD Ingress
-        run: |
-          cd gitops-config
-          git config user.name "abinash.sethi"
-          git config user.email "abinash.sethi@gmail.com"
           git add app/dev/cluster-config/argocd-ingress.yaml
-          git commit -m "Update ACM ARN in ArgoCD Ingress from Terraform output" || true
+          git commit -m "Update GitOps manifests from Terraform outputs" || true
           git push
