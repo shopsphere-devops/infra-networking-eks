@@ -70,6 +70,7 @@ resource "aws_db_parameter_group" "this" {
 resource "random_password" "master" {
   length  = 20
   special = true
+  override_special = "!#$%^&*()-_=+[]{}<>:?" # exclude '/', '@', '"', ' '
 }
 
 # Securely stores the DB credentials in AWS Secrets Manager.

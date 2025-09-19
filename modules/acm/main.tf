@@ -7,6 +7,11 @@ terraform {
   }
 }
 
+provider "aws" {
+  alias  = "dns"
+  region = "us-east-1"
+}
+
 # Requests an SSL/TLS certificate from AWS Certificate Manager (ACM) for the domain specified in var.domain_name.
 # validation_method = "DNS": Tells ACM you will prove ownership of the domain by creating a DNS record.
 # lifecycle : Ensures that if you ever change the certificate, Terraform will create the new one before deleting the old one (to avoid downtime).
