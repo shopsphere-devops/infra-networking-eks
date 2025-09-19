@@ -35,12 +35,6 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform init
 
-      - name: Terraform rm ACM
-        run: |
-          cd infra-terraform/envs/dev/infra
-          terraform state rm module.acm.aws_acm_certificate.this || true
-          terraform state rm module.acm.aws_route53_record.validation || true
-
       - name: Terraform Import Secret (idempotent for dev)
         run: |
           cd infra-terraform/envs/dev/infra

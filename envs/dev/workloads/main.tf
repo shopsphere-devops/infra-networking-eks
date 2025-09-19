@@ -5,7 +5,6 @@
 # Use the AWS Provider and the AWS Profile is dev-sso
 provider "aws" {
   region = "us-east-1"
-  #profile = "dev-sso"
 }
 
 provider "aws" {
@@ -132,10 +131,13 @@ module "cert_manager" {
 
 module "dns" {
   source       = "../../../modules/dns"
-  providers    = { aws = aws.dns }
-  zone_id      = var.route53_zone_id
-  record_name  = var.argocd_domain
+  zone_id      = var.route53_zone_id  # mgmt account hosted zone ID
+  record_name  = var.argocd_domain    # e.g. "argocd"
   record_type  = "CNAME"
-  record_value = module.alb.dns_name # Replace with your ALB's DNS name output
+  record_value = module.alb.dns_name  # ALB dns_name output from ALB module
   ttl          = 300
+
+  providers    = {
+    aws = aws.dns     # # ensure the module's Route53 resource runs in mgmt account
+    }
 }

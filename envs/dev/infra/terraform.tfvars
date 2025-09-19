@@ -146,4 +146,5 @@ eks_managed_node_groups = {
   }
 }
 
+# ACM & DNS
 route53_zone_id = "Z0268706UU9TQZA0BBT4" # <-- Replace with your actual Hosted Zone ID

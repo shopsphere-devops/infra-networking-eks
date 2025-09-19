@@ -11,7 +11,6 @@ terraform {
 # validation_method = "DNS": Tells ACM you will prove ownership of the domain by creating a DNS record.
 # lifecycle : Ensures that if you ever change the certificate, Terraform will create the new one before deleting the old one (to avoid downtime).
 resource "aws_acm_certificate" "this" {
-  #provider          = aws
   domain_name       = var.domain_name
   validation_method = "DNS"
   lifecycle {
@@ -26,7 +25,7 @@ locals {
   dvo = tolist(aws_acm_certificate.this.domain_validation_options)[0]
 }
 
-# Creates a DNS record in your Route53 hosted zone (var.zone_id) with the name, type, and value provided by ACM.
+# CREATE the Route53 validation record in the MANAGEMENT account via provider aws.dns
 # This record proves to ACM that you control the domain, allowing ACM to issue the certificate.
 resource "aws_route53_record" "validation" {
   provider = aws.dns
@@ -41,7 +40,6 @@ resource "aws_route53_record" "validation" {
 # certificate_arn: References the certificate you requested.
 # validation_record_fqdns: Points to the fully qualified DNS name of the validation record you created.
 resource "aws_acm_certificate_validation" "this" {
-  #provider                = aws
   certificate_arn         = aws_acm_certificate.this.arn
   validation_record_fqdns = [aws_route53_record.validation.fqdn]
 }

@@ -26,6 +26,7 @@ output "rds_endpoint" {
   value = module.rds.db_instance_endpoint
 }
 
-output "acm_cert_arn" {
-  value = module.acm.certificate_arn
+output "acm_certificate_arn" {
+  value       = module.acm.acm_certificate_arn
+  description = "ACM certificate ARN for argocd.hellosaanvika.com"
 }

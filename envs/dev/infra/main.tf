@@ -1,19 +1,14 @@
 #######################################################
 #    PROVIDERS
 #######################################################
-
-# Use the AWS Provider and the AWS Profile is dev-sso
+# Default provider for creating resources in dev account
 provider "aws" {
   region = "us-east-1"
-  #profile = "dev-sso"
 }
 
-# Provider with alias for Route53 (if needed in ACM/DNS)
-provider "aws" {
-  alias  = "dns"
-  region = "us-east-1"
-}
-/*
+# Aliased provider for Route53 in MANAGEMENT account.
+# This allows the infra workspace to create DNS records in the management account.
+# KEEP this provider until you destroy all resources that used it.
 provider "aws" {
   alias  = "dns"
   region = "us-east-1"
@@ -21,7 +16,7 @@ provider "aws" {
     role_arn = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
   }
 }
-*/
+
 #######################################################
 #    DATA BLOCK
 #######################################################
@@ -156,10 +151,11 @@ module "rds" {
 
 module "acm" {
   source      = "../../../modules/acm"
+  domain_name = "argocd.hellosaanvika.com"
+  zone_id     = var.route53_zone_id
+
   providers = {
     aws      = aws
     aws.dns  = aws.dns
   }
-  domain_name = "argocd.hellosaanvika.com"
-  zone_id     = var.route53_zone_id
 }
