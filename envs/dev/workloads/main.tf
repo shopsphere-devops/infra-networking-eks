@@ -48,12 +48,19 @@ data "aws_eks_cluster_auth" "this" {
   name = data.terraform_remote_state.infra.outputs.cluster_name
 }
 
+data "kubernetes_ingress_v1" "argocd" {
+  metadata {
+    name      = "argocd-server-ingress"
+    namespace = "argocd"
+  }
+}
+
 #######################################################
 #    APPLICATION LOAD BALANCER - HELM
 #######################################################
 
-module "helm_alb" {
-  source = "../../../modules/helm-alb"
+module "alb_controller" {
+  source = "../../../modules/alb_controller"
 
   cluster_name                 = data.terraform_remote_state.infra.outputs.cluster_name
   region                       = var.region
@@ -134,10 +141,15 @@ module "dns" {
   zone_id      = var.route53_zone_id # mgmt account hosted zone ID
   record_name  = var.argocd_domain   # e.g. "argocd"
   record_type  = "CNAME"
-  record_value = module.alb.dns_name # ALB dns_name output from ALB module
+  record_value = data.kubernetes_ingress_v1.argocd.status[0].load_balancer[0].ingress[0].hostname
   ttl          = 300
 
   providers = {
     aws = aws.dns # # ensure the module's Route53 resource runs in mgmt account
   }
+
+  depends_on = [
+    module.alb_controller,  # ensure ALB controller is installed
+    module.argocd           # ensure ArgoCD release is installed (Ingress created)
+  ]
 }

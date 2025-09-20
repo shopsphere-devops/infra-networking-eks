@@ -49,4 +49,4 @@ kubeconfig_path = "~/.kube/config"
 #######################################################
 
 route53_zone_id = "Z0268706UU9TQZA0BBT4" # <-- Replace with your actual Hosted Zone ID
-argocd_domain   = "argocd.hellosaanvika.com"
+argocd_domain   = "argocd-dev.hellosaanvika.com"

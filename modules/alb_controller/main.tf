@@ -13,7 +13,7 @@ resource "aws_iam_policy" "alb_controller" {
 }
 
 ############################################################
-# IAM Role for ALB Controller (via IRSA)
+# IAM Role for AWS LB Controller (via IRSA)
 ############################################################
 
 # This uses a Terraform module to create an IAM Role for Service Accounts (IRSA) for EKS.
@@ -23,11 +23,11 @@ module "alb_irsa_role" {
 
 # role_name_prefix: Prefix for the IAM role name.
   role_name_prefix = "${var.cluster_name}-alb"
-# attach_policy_arns: Attaches the policy created above.  
+# attach_policy_arns: Attaches the policy created above.
   role_policy_arns = {
     alb_controller = aws_iam_policy.alb_controller.arn
   }
-  
+
 
 # Connects the IAM role to the EKS cluster’s OIDC provider.
 # Restricts the role to be assumable only by the aws-load-balancer-controller service account in the kube-system namespace.

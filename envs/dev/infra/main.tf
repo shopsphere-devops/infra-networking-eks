@@ -151,7 +151,7 @@ module "rds" {
 
 module "acm" {
   source      = "../../../modules/acm"
-  domain_name = "argocd.hellosaanvika.com"
+  domain_name = "argocd-dev.hellosaanvika.com"
   zone_id     = var.route53_zone_id
 
   providers = {

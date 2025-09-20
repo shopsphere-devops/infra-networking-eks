@@ -39,5 +39,3 @@ variable "cluster_ca_certificate" {
   description = "EKS cluster CA certificate"
   type        = string
 }
-
-
