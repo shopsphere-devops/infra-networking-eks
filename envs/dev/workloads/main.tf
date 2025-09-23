@@ -149,7 +149,7 @@ module "dns" {
   }
 
   depends_on = [
-    module.alb_controller,  # ensure ALB controller is installed
-    module.argocd           # ensure ArgoCD release is installed (Ingress created)
+    module.alb_controller, # ensure ALB controller is installed
+    module.argocd          # ensure ArgoCD release is installed (Ingress created)
   ]
 }
