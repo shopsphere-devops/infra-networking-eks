@@ -13,7 +13,8 @@ output "cluster_ca_certificate" {
 output "oidc_provider_arn" {
   value = var.oidc_provider_arn
 }
-
+/*
 output "dns_name" {
   value = aws_lb.this.dns_name
 }
+*/
