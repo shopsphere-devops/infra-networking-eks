@@ -111,10 +111,10 @@ module "eso" {
   source               = "../../../modules/eso"
   namespace            = "external-secrets"
   chart_version        = "0.9.18"
-  service_account_name = "external-secrets"  
-  kubeconfig_path     = var.kubeconfig_path
-  secretsmanager_arns = [data.terraform_remote_state.infra.outputs.db_secret_arn]
-  eks_cluster_name    = var.cluster_name
+  service_account_name = "external-secrets"
+  kubeconfig_path      = var.kubeconfig_path
+  secretsmanager_arns  = [data.terraform_remote_state.infra.outputs.db_secret_arn]
+  eks_cluster_name     = var.cluster_name
 
   providers = {
     kubernetes = kubernetes
