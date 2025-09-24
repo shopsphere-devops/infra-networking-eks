@@ -161,12 +161,12 @@ module "dns" {
 module "external_dns" {
   source = "../../../modules/external-dns"
 
-  cluster_name       = data.terraform_remote_state.infra.outputs.cluster_name
-  oidc_provider_arn  = data.terraform_remote_state.infra.outputs.oidc_provider_arn
-  region             = var.region
-  env                = var.env
-  project            = var.project
-  route53_zone_id    = var.route53_zone_id
-  route53_zone_name  = var.route53_zone_name # set this variable in workloads/terraform.tfvars
+  cluster_name              = data.terraform_remote_state.infra.outputs.cluster_name
+  oidc_provider_arn         = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  region                    = var.region
+  env                       = var.env
+  project                   = var.project
+  route53_zone_id           = var.route53_zone_id
+  route53_zone_name         = var.route53_zone_name # set this variable in workloads/terraform.tfvars
   externaldns_chart_version = var.externaldns_chart_version
 }

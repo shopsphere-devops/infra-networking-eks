@@ -85,7 +85,7 @@ variable "route53_zone_id" {
   type = string
 }
 variable "route53_zone_name" {
-  type = string
+  type        = string
   description = "example: hellosaanvika.com"
 }
 variable "externaldns_chart_version" {
