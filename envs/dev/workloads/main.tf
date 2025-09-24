@@ -126,34 +126,6 @@ module "argocd" {
   chart_version = var.argocd_chart_version
   argocd_values = var.argocd_values
 }
-/*
-module "cert_manager" {
-  source = "../../../modules/cert-manager"
-}
-*/
-
-#######################################################
-#    Route53
-#######################################################
-/*
-module "dns" {
-  source       = "../../../modules/dns"
-  zone_id      = var.route53_zone_id # mgmt account hosted zone ID
-  record_name  = var.argocd_domain   # e.g. "argocd"
-  record_type  = "CNAME"
-  record_value = data.kubernetes_ingress_v1.argocd.status[0].load_balancer[0].ingress[0].hostname
-  ttl          = 300
-
-  providers = {
-    aws = aws.dns # # ensure the module's Route53 resource runs in mgmt account
-  }
-
-  depends_on = [
-    module.alb_controller, # ensure ALB controller is installed
-    module.argocd          # ensure ArgoCD release is installed (Ingress created)
-  ]
-}
-*/
 
 #######################################################
 #    External DNS
