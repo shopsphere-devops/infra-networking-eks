@@ -48,11 +48,12 @@ module "externaldns_irsa_role" {
 # Install ExternalDNS with Helm
 resource "helm_release" "external_dns" {
   name             = "external-dns"
-  repository       = "https://charts.bitnami.com/bitnami"
+  repository       = "https://kubernetes-sigs.github.io/external-dns/"
   chart            = "external-dns"
   version          = var.externaldns_chart_version
   namespace        = "external-dns"
   create_namespace = true
+
 
   # Use Helm set blocks to configure the chart. We let Helm create the SA but annotate it with the IRSA role ARN:
   set =[

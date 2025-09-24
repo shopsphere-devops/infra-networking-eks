@@ -26,5 +26,5 @@ variable "route53_zone_name" {
 
 variable "externaldns_chart_version" {
   type    = string
-  default = "10.6.0" # change if you prefer another version
+  default = "1.15.0" # latest stable as of Sept 2025
 }
