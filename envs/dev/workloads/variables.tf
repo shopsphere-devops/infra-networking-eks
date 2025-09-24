@@ -82,12 +82,13 @@ variable "kubeconfig_path" {
 #######################################################
 
 variable "route53_zone_id" {
-  description = "The Route53 Hosted Zone ID for your domain"
-  type        = string
+  type = string
 }
-
-variable "argocd_domain" {
-  description = "The FQDN for ArgoCD ingress"
-  type        = string
-  default     = "argocd.hellosaanvika.com"
+variable "route53_zone_name" {
+  type = string
+  description = "example: hellosaanvika.com"
+}
+variable "externaldns_chart_version" {
+  type    = string
+  default = "10.6.0"
 }

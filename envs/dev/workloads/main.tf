@@ -135,7 +135,7 @@ module "cert_manager" {
 #######################################################
 #    Route53
 #######################################################
-
+/*
 module "dns" {
   source       = "../../../modules/dns"
   zone_id      = var.route53_zone_id # mgmt account hosted zone ID
@@ -152,4 +152,21 @@ module "dns" {
     module.alb_controller, # ensure ALB controller is installed
     module.argocd          # ensure ArgoCD release is installed (Ingress created)
   ]
+}
+*/
+
+#######################################################
+#    External DNS
+#######################################################
+module "external_dns" {
+  source = "../../../modules/external-dns"
+
+  cluster_name       = data.terraform_remote_state.infra.outputs.cluster_name
+  oidc_provider_arn  = data.terraform_remote_state.infra.outputs.oidc_provider_arn
+  region             = var.region
+  env                = var.env
+  project            = var.project
+  route53_zone_id    = var.route53_zone_id
+  route53_zone_name  = var.route53_zone_name # set this variable in workloads/terraform.tfvars
+  externaldns_chart_version = var.externaldns_chart_version
 }
