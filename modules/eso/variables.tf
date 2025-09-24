@@ -48,8 +48,4 @@ variable "secretsmanager_arns" {
   type        = list(string)
 }
 
-variable "kubernetes_provider" {
-  type    = any
-  description = "The external Kubernetes provider to use"
-}
 
