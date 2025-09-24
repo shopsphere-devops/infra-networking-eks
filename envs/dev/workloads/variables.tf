@@ -90,5 +90,5 @@ variable "route53_zone_name" {
 }
 variable "externaldns_chart_version" {
   type    = string
-  default = "10.6.0"
+  default = "1.15.0"
 }
