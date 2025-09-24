@@ -96,6 +96,9 @@ module "observability" {
   tags               = var.tags
   region             = var.region
   fluentbit_role_arn = module.fluentbit_irsa_role.iam_role_arn
+  depends_on = [
+    module.alb_controller
+  ]
 
   # If you want to override SA names or chart versions, set vars here
 }
@@ -113,6 +116,9 @@ module "eso" {
   kubeconfig_path     = var.kubeconfig_path
   secretsmanager_arns = [data.terraform_remote_state.infra.outputs.db_secret_arn]
   eks_cluster_name    = var.cluster_name
+  depends_on = [
+    module.alb_controller
+  ]
 }
 
 #######################################################
@@ -125,6 +131,9 @@ module "argocd" {
   namespace     = var.argocd_namespace
   chart_version = var.argocd_chart_version
   argocd_values = var.argocd_values
+  depends_on = [
+    module.alb_controller
+  ]
 }
 
 #######################################################
