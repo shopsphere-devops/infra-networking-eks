@@ -47,3 +47,9 @@ variable "secretsmanager_arns" {
   description = "List of Secrets Manager ARNs ESO can access"
   type        = list(string)
 }
+
+variable "kubernetes_provider" {
+  type    = any
+  description = "The external Kubernetes provider to use"
+}
+
