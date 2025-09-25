@@ -67,6 +67,11 @@ resource "helm_release" "external_dns" {
     value = var.region
   },
 
+  {
+  name  = "extraArgs[1]"
+  value = "--aws-assume-role=arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+  },
+
   # Limit ExternalDNS to manage only your hosted zone (security best practice)
     {
     name  = "extraArgs[0]"
@@ -88,11 +93,6 @@ resource "helm_release" "external_dns" {
     {
     name  = "serviceAccount.name"
     value = "external-dns"
-  },
-
-    {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.externaldns_irsa_role.iam_role_arn
   },
 
   # Optional: tune log level etc
