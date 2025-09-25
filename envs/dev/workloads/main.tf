@@ -116,10 +116,10 @@ module "eso" {
   secretsmanager_arns  = [data.terraform_remote_state.infra.outputs.db_secret_arn]
   eks_cluster_name     = var.cluster_name
 
-  
+
   providers = {
     kubernetes = kubernetes
-    helm = helm
+    helm       = helm
   }
 
   depends_on = [
