@@ -72,7 +72,10 @@ resource "helm_release" "otel_collector" {
     namespace = var.namespace
     version = var.otel_chart_version
     values = [file("${path.module}/values/opentelemetry-collector.yaml")]
-    depends_on = [kubernetes_namespace.obs]
+    depends_on = [
+    helm_release.kps
+    ]
+    #depends_on = [kubernetes_namespace.obs]
 }
 
 # Conclusion :
