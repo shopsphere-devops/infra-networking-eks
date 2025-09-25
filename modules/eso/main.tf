@@ -1,7 +1,4 @@
-resource "helm_release" "eso" {  
-
-  provider = var.kubernetes_provider
-  
+resource "helm_release" "eso" {    
   name       = "external-secrets"
   namespace  = var.namespace
   repository = "https://charts.external-secrets.io"
