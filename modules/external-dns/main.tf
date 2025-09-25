@@ -23,6 +23,7 @@ resource "aws_iam_policy" "externaldns_policy" {
 }
 
 # Use the same role-for-service-account module pattern as your alb_irsa role
+/*
 module "externaldns_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.39"
@@ -44,6 +45,7 @@ module "externaldns_irsa_role" {
     Project     = var.project
   }
 }
+*/
 
 # Install ExternalDNS with Helm
 resource "helm_release" "external_dns" {
@@ -56,47 +58,40 @@ resource "helm_release" "external_dns" {
 
 
   # Use Helm set blocks to configure the chart. We let Helm create the SA but annotate it with the IRSA role ARN:
-  set =[
-    {
+set = [
+  {
     name  = "provider"
     value = "aws"
   },
-
-    {
+  {
     name  = "aws.region"
     value = var.region
   },
-
   {
-  name  = "extraArgs[1]"
-  value = "--aws-assume-role=arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
-  },
-
-  # Limit ExternalDNS to manage only your hosted zone (security best practice)
-    {
     name  = "extraArgs[0]"
     value = "--domain-filter=${var.route53_zone_name}"
   },
-
-  # Use TXT ownership method or outright CNAME; TXT is often recommended.
-    {
+  {
+    name  = "extraArgs[1]"
+    value = "--aws-assume-role=arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+  },
+  {
     name  = "txtOwnerId"
     value = var.cluster_name
   },
-
-  # Let Helm create serviceaccount and then annotate it with the IRSA role arn
-    {
+  {
     name  = "serviceAccount.create"
     value = "true"
   },
-
-    {
+  {
     name  = "serviceAccount.name"
     value = "external-dns"
   },
-
-  # Optional: tune log level etc
-    {
+  {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+  },
+  {
     name  = "rbac.create"
     value = "true"
   }
