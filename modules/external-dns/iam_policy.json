@@ -2,14 +2,21 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "Route53ReadWriteForSpecificZone",
+      "Sid": "Route53ListZones",
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListHostedZones",
+        "route53:ListHostedZonesByName"
+      ],
+      "Resource": ["*"]
+    },
+    {
+      "Sid": "Route53ChangeRecordsInSpecificZone",
       "Effect": "Allow",
       "Action": [
         "route53:GetHostedZone",
         "route53:ChangeResourceRecordSets",
         "route53:ListResourceRecordSets",
-        "route53:ListHostedZones",
-        "route53:ListHostedZonesByName",
         "route53:GetChange"
       ],
       "Resource": [
