@@ -39,6 +39,7 @@ jobs:
 
       - name: Remove Orphaned route53
         run: |
+          cd infra-terraform/envs/dev/infra
           terraform state list | grep route53
           terraform state rm module.acm.aws_route53_record.validation    
 
