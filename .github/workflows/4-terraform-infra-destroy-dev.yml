@@ -37,6 +37,11 @@ jobs:
           cd infra-terraform/envs/dev/infra
           terraform state rm 'module.rds.aws_secretsmanager_secret.db' || true
 
+      - name: Remove Orphaned route53
+        run: |
+          terraform state list | grep route53
+          terraform state rm module.acm.aws_route53_record.validation    
+
       - name: Terraform Destroy
         run: |
           cd infra-terraform/envs/dev/infra
