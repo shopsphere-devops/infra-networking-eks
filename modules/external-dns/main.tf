@@ -23,15 +23,15 @@ resource "aws_iam_policy" "externaldns_policy" {
 }
 
 # Use the same role-for-service-account module pattern as your alb_irsa role
-/*
+
 module "externaldns_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.39"
 
-  role_name_prefix = "${var.cluster_name}-externaldns"
-  role_policy_arns = {
-    externaldns = aws_iam_policy.externaldns_policy.arn
-  }
+  role_name = "dev-externaldns-irsa"
+#  role_policy_arns = {
+#    externaldns = aws_iam_policy.externaldns_policy.arn
+#  }
 
   oidc_providers = {
     main = {
@@ -45,7 +45,26 @@ module "externaldns_irsa_role" {
     Project     = var.project
   }
 }
-*/
+
+resource "aws_iam_policy" "externaldns_assume_mgmt" {
+  name = "${var.cluster_name}-externaldns-assume-mgmt"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "sts:AssumeRole",
+        Resource = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "externaldns_assume_mgmt_attach" {
+  role       = module.externaldns_irsa_role.iam_role_name
+  policy_arn = aws_iam_policy.externaldns_assume_mgmt.arn
+}
+
 
 # Install ExternalDNS with Helm
 resource "helm_release" "external_dns" {
@@ -87,10 +106,11 @@ set = [
     name  = "serviceAccount.name"
     value = "external-dns"
   },
-  {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
+    
+  { name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn" 
+    value = module.externaldns_irsa_role.iam_role_arn 
   },
+
   {
     name  = "rbac.create"
     value = "true"

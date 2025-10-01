@@ -5,7 +5,7 @@
 provider "aws" {
   region = "us-east-1"
 }
-/*
+
 # Aliased provider for Route53 in MANAGEMENT account.
 # This allows the infra workspace to create DNS records in the management account.
 # KEEP this provider until you destroy all resources that used it.
@@ -16,7 +16,7 @@ provider "aws" {
     role_arn = "arn:aws:iam::435159110051:role/Route53RecordManagerForDev"
   }
 }
-*/
+
 #######################################################
 #    DATA BLOCK
 #######################################################
@@ -144,7 +144,7 @@ module "rds" {
   performance_insights_enabled = false
   maintenance_window           = "Mon:00:00-Mon:03:00"
 }
-/*
+
 #######################################################
 #    AWS Certificate Manager
 #######################################################
@@ -159,4 +159,4 @@ module "acm" {
     aws.dns = aws.dns
   }
 }
-*/
+
