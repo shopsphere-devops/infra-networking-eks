@@ -27,11 +27,17 @@ variable "argocd_values" {
       }
       metrics = {
         enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
       }
     }
     repoServer = {
       metrics = {
         enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
       }
       resources = {
         limits = {
@@ -43,6 +49,9 @@ variable "argocd_values" {
     controller = {
       metrics = {
         enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
       }
       resources = {
         limits = {
@@ -54,11 +63,17 @@ variable "argocd_values" {
     dex = {
       metrics = {
         enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
       }
     }
     applicationSet = {
       metrics = {
         enabled = true
+        serviceMonitor = {
+          enabled = true
+        }
       }
     }
   }
