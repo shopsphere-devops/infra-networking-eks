@@ -56,6 +56,10 @@ variable "argocd_values" {
         enabled = true
       }
     }
+    applicationSet = {
+      metrics = {
+        enabled = true
+      }
+    }
   }
 }
-
