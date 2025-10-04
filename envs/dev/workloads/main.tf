@@ -156,4 +156,7 @@ module "external_dns" {
   route53_zone_id           = var.route53_zone_id
   route53_zone_name         = var.route53_zone_name # set this variable in workloads/terraform.tfvars
   externaldns_chart_version = var.externaldns_chart_version
+  depends_on = [
+    module.alb_controller
+  ]
 }

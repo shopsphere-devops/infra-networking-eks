@@ -30,6 +30,9 @@ variable "argocd_values" {
       }
     }
     repoServer = {
+      metrics = {
+        enabled = true
+      }
       resources = {
         limits = {
           cpu    = "500m"
@@ -38,6 +41,9 @@ variable "argocd_values" {
       }
     }
     controller = {
+      metrics = {
+        enabled = true
+      }
       resources = {
         limits = {
           cpu    = "500m"
@@ -45,5 +51,11 @@ variable "argocd_values" {
         }
       }
     }
+    dex = {
+      metrics = {
+        enabled = true
+      }
+    }
   }
 }
+
